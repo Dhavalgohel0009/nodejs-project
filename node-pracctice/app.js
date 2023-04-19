@@ -3,9 +3,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mysqlConnect = require("./services/mysql-connection")
+const session = require('express-session');
 
 var indexRouter = require('./routes/index');
+const dbRouter = require("./routes/mysql-tut");
 var usersRouter = require('./routes/users');
+const loginRouter = require('./routes/login');
 
 var app = express();
 
@@ -13,6 +17,12 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.use(session({
+  name: "session-id",
+  secret: "GFGEnter", // Secret key,
+  saveUninitialized: false,
+  resave: false
+}))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -21,6 +31,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/mysql',dbRouter);
+app.use('/login',loginRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
